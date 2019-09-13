@@ -1,0 +1,32 @@
+﻿@using System.Data
+@using System.Text.RegularExpressions
+
+@model Models.ReportGrid
+
+<link href="~/Content/MvcGrid/mvc-grid.css" rel="stylesheet" />
+
+
+@(Html.Grid(Model.Data.AsEnumerable())
+              .Build(columns =>
+              {
+                  var square = new Regex("\\[(.*?)\\]");
+                  foreach (DataColumn dataColumn in Model.Data.Columns)
+                  {
+          //Resort to default behaviour (defined in new object, if we do not have defined behaviour for this column)
+          Models.ReportGrid.Column columnInfo = Model.Columns.FirstOrDefault(x => x.DataTableName == square.Replace(dataColumn.ColumnName, "")) ?? new Models.ReportGrid.Column();
+
+                      Grid.FormatGridColumn(columns, dataColumn, columnInfo);
+                  }
+              })
+              .Empty(Model.EmptyText)
+              .Filterable()
+              .Pageable(x => x.RowsPerPage = Model.RowsPerPage)
+      )
+
+<script src="~/Scripts/MvcGrid/mvc-grid.js"></script>
+
+<script>
+   [].forEach.call(document.getElementsByClassName('mvc-grid'), function (element) {
+               new MvcGrid(element);
+         });
+</script>
